@@ -5,6 +5,7 @@ TrilobitPkgBundle
 
 
 ...en...
+Provides Public Key Grabbing by querying keyservers for domain @domain.tld.
 
 
 Backend Ausschnitt
