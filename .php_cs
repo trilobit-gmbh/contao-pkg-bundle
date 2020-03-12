@@ -29,12 +29,8 @@ return PhpCsFixer\Config::create()
             'psr4' => true,
             'strict_comparison' => true,
             'strict_param' => true,
-            'LeoFeyer/optimize_native_functions' => true,
          ])
     ->setFinder(
         PhpCsFixer\Finder::create()->in([__DIR__.'/src'])
     )
-    ->registerCustomFixers([
-        new LeoFeyer\PhpCsFixer\OptimizeNativeFunctionsFixer()
-    ])
 ;

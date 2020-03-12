@@ -7,7 +7,7 @@
  * @link       http://github.com/trilobit-gmbh/contao-pkg-bundle
  */
 
-namespace Trilobit\PkgBundle;
+namespace Trilobit\PkgBundle\FrontendModule;
 
 use Contao\BackendTemplate;
 use Contao\FrontendTemplate;
@@ -20,15 +20,10 @@ use Patchwork\Utf8;
  *
  * Class TrilobitPublicKeyGrabber
  */
-class ModulePublicKeyGrabber extends Module
+class PublicKeyGrabberModule extends Module
 {
-    /**
-     *
-     */
     const KEYSERVER_SEARCH_URL = '/pks/lookup?op=index&search=%s&fingerprint=on';
-    /**
-     *
-     */
+
     const KEY_REVOKED_MARKER = '*** KEY REVOKED ***';
 
     /**
@@ -178,6 +173,7 @@ class ModulePublicKeyGrabber extends Module
 
     /**
      * @param $strApiUrl
+     *
      * @return array
      */
     protected function apiCall($strApiUrl)
@@ -218,7 +214,6 @@ class ModulePublicKeyGrabber extends Module
     protected function getPageContent()
     {
         $this->strCurrentKeyServer = $this->getKeyserverUrl();
-        //$pageContent = @file_get_contents($this->strCurrentKeyServer.$this->getKeyserverUrlFragment());
 
         $apiFeedback = $this->apiCall($this->strCurrentKeyServer.$this->getKeyserverUrlFragment());
         $pageContent = $apiFeedback['CONTENT'];
@@ -227,8 +222,6 @@ class ModulePublicKeyGrabber extends Module
             $this->strCurrentKeyServer = $this->getFallbackKeyserverUrl();
 
             if (!empty($this->strCurrentKeyServer)) {
-                //$pageContent = @file_get_contents($this->strCurrentKeyServer.$this->getKeyserverUrlFragment());
-
                 $apiFeedback = $this->apiCall($this->strCurrentKeyServer.$this->getKeyserverUrlFragment());
                 $pageContent = $apiFeedback['CONTENT'];
 

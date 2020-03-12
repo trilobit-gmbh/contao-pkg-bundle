@@ -8,4 +8,5 @@
  */
 
 // MOD
-$GLOBALS['TL_LANG']['FMD']['publickeygrabber'][0] = 'Public Key Grabber';
+$GLOBALS['TL_LANG']['FMD']['pkg'][0] = 'Public Key Grabber';
+$GLOBALS['TL_LANG']['FMD']['pkg'][1] = 'Integrate Public Key Grabber as frontend module.';

@@ -2,8 +2,9 @@
     <ul>
         <?php foreach ($this->items as $publicKeyElement): ?>
             <li>
-                <?= $publicKeyElement['name'] ?>&nbsp;{{email::<?= $publicKeyElement['email'] ?>}}<br>
-                <a href="<?= $this->currentKeyServer . $publicKeyElement['url'] ?>" rel="nofollow">
+                <?= $publicKeyElement['name'] ?><br>
+                {{email::<?= $publicKeyElement['email'] ?>}}<br>
+                <a href="<?= $this->currentKeyServer . $publicKeyElement['url'] ?>" rel="nofollow" rel=”noopener” oder rel=”noreferrer”>
                     <?= $publicKeyElement['pki'] ?>
                 </a>
             </li>

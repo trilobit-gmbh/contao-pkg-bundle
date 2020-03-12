@@ -7,7 +7,7 @@
  * @link       http://github.com/trilobit-gmbh/contao-pkg-bundle
  */
 
-$GLOBALS['TL_DCA']['tl_module']['palettes']['publickeygrabber'] = '{title_legend},name,headline,type;{template_legend:hide},publickeygrabberTpl,customTpl;{publickeygrabber_legend},pkgHost,pkgHostFallback,pkgEmailDomain,pkgBlacklistedEmails,pkgFilters;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['pkg'] = '{title_legend},name,headline,type;{template_legend:hide},publickeygrabberTpl,customTpl;{publickeygrabber_legend},pkgHost,pkgHostFallback,pkgEmailDomain,pkgBlacklistedEmails,pkgFilters;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['publickeygrabberTpl'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['publickeygrabberTpl'],
@@ -56,7 +56,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['pkgBlacklistedEmails'] = [
                 'exclude' => true,
                 'inputType' => 'text',
                 'eval' => [
-                    'rgxp' => 'email',
                     'decodeEntities' => true,
                 ],
             ],

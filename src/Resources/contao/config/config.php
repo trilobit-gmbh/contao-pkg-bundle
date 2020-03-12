@@ -7,4 +7,6 @@
  * @link       http://github.com/trilobit-gmbh/contao-pkg-bundle
  */
 
-$GLOBALS['FE_MOD']['application']['publickeygrabber'] = 'Trilobit\PkgBundle\ModulePublicKeyGrabber';
+use Trilobit\PkgBundle\FrontendModule\PublicKeyGrabberModule;
+
+$GLOBALS['FE_MOD']['application']['pkg'] = PublicKeyGrabberModule::class;
