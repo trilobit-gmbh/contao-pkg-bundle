@@ -12,15 +12,15 @@ Die häufig angetroffene Methode, bei der E-Mail Vertraulichkeit und Authentizit
 
 Mit Public-Key-Infrastruktur (PKI, englisch public key infrastructure) bezeichnet man in der Kryptologie ein System, das digitale Zertifikate ausstellen, verteilen und prüfen kann. Die innerhalb einer PKI ausgestellten Zertifikate werden zur Absicherung rechnergestützter Kommunikation verwendet.
 
-Das TrilobitPkgBundle kann auf diese Infrastruktur zugreifen und den öffentlichen Schlüssel zu einer E-MAil-Adresse auslesen und ausgeben.
-
 Mit Hilfe eines asymmetrischen Kryptosystems können Nachrichten in einem Netzwerk digital signiert und verschlüsselt werden. Sichere Kryptosysteme können bei geeigneter Wahl der Parameter (z. B. der Schlüssellänge) auch bei Kenntnis des Verfahrens (vgl. Kerckhoffs’ Prinzip) zumindest nach heutigem Kenntnisstand[1] nicht in überschaubarer Zeit gebrochen werden.
 
 In asymmetrischen Kryptosystemen benötigt der Sender für eine verschlüsselte Übermittlung den öffentlichen Schlüssel (Public Key) des Empfängers. Dieser könnte z. B. per E-Mail versandt oder von einer Web-Seite heruntergeladen werden. Dabei muss sichergestellt sein, dass es sich tatsächlich um den Schlüssel des Empfängers handelt und nicht um eine Fälschung eines Betrügers.
 
-Hierzu dienen nun digitale Zertifikate, die die Authentizität eines öffentlichen Schlüssels und seinen zulässigen Anwendungs- und Geltungsbereich bestätigen. Das digitale Zertifikat ist selbst durch eine digitale Signatur geschützt, deren Echtheit mit dem öffentlichen Schlüssel des Ausstellers des Zertifikates geprüft werden kann.
+Das TrilobitPkgBundle kann auf diese Infrastruktur zugreifen und den öffentlichen Schlüssel zu einer E-MAil-Adresse auslesen und ausgeben.
 
-Um die Authentizität des Ausstellerschlüssels zu prüfen, wird wiederum ein digitales Zertifikat benötigt. Auf diese Weise lässt sich eine Kette von digitalen Zertifikaten aufbauen, die jeweils die Authentizität des öffentlichen Schlüssels bestätigen, mit dem das vorhergehende Zertifikat geprüft werden kann. Eine solche Kette von Zertifikaten wird Validierungspfad oder Zertifizierungspfad genannt. Auf die Echtheit des letzten Zertifikates (und des durch dieses zertifizierten Schlüssels) müssen sich die Kommunikationspartner ohne ein weiteres Zertifikat verlassen können.
+Quellen:
+* https://de.wikipedia.org/wiki/E-Mail-Verschl%C3%BCsselung
+* https://de.wikipedia.org/wiki/Public-Key-Infrastruktur
 
 
 Backend Ausschnitt
@@ -44,4 +44,4 @@ Install the extension via composer: [trilobit-gmbh/contao-pkg-bundle](https://pa
 Compatibility
 -------------
 
-- Contao version ~4.8
+- Contao version ~4.9
