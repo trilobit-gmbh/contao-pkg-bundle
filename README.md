@@ -18,6 +18,24 @@ In asymmetrischen Kryptosystemen benötigt der Sender für eine verschlüsselte 
 
 Das TrilobitPkgBundle kann auf diese Infrastruktur zugreifen und den öffentlichen Schlüssel zu einer E-MAil-Adresse auslesen und ausgeben.
 
+---
+
+E-Mail encryption is used to send confidential information by email from the sender to the recipient.
+
+Email encryption often goes hand in hand with the digital signature and is actually combined with it in many standards such as X.509 or PGP. The aim of a digitally signed email is to send information from the sender to the recipient in such a way that the sender can be clearly identified and no one can manipulate the email unnoticed on its way from the sender to the recipient. The email signature thus satisfies the need for authenticity and integrity, but does not ensure confidentiality; this requires encryption. 
+
+The most common encountered method of achieving confidentiality and authenticity in email is PKI-based email encryption and signature. PKI stands for public key infrastructure. PKI-based email encryption and signature almost always uses one of the following two standards:
+
+S/MIME: Secure / Multipurpose Internet Mail Extensions
+OpenPGP: Open Pretty Good Privacy
+In cryptology, public key infrastructure (PKI) is a system that can issue, distribute and verify digital certificates. The certificates issued within a PKI are used to secure computer-supported communication.
+
+Using an asymmetric cryptosystem, messages in a network can be digitally signed and encrypted. Secure cryptosystems cannot be broken within a reasonable amount of time, at least according to the current state of knowledge [1], if the parameters (e.g. key length) are selected appropriately, even if the method is known (see Kerckhoff's principle). 
+
+In asymmetric cryptosystems, the sender needs the recipient's public key for encrypted transmission. This could e.g. sent via email or downloaded from a website. It must be ensured that it is actually the recipient's key and not a forgery by a fraudster.
+
+The TrilobitPkgBundle can access this infrastructure and read and output the public key to an email address.
+
 Quellen:
 * https://de.wikipedia.org/wiki/E-Mail-Verschl%C3%BCsselung
 * https://de.wikipedia.org/wiki/Public-Key-Infrastruktur
@@ -32,7 +50,7 @@ Backend Ausschnitt
 Beispielhafte Ausgabe im Frontend
 ------------
 
-![Backend Ausschnitt](docs/images/pkg_fe.png?raw=true "TrilobitPkgBundle")
+<img src="./docs/images/pkg_fe.png" alt="Backend Ausschnitt" title="TrilobitPkgBundle" width="25%">
 
 
 Installation
