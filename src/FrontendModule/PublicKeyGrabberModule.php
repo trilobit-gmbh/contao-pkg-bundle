@@ -191,7 +191,7 @@ class PublicKeyGrabberModule extends Module
         curl_setopt($objCurl, CURLOPT_SSL_VERIFYPEER, false);    // required for https urls
         curl_setopt($objCurl, CURLOPT_CONNECTTIMEOUT, 30);
         curl_setopt($objCurl, CURLOPT_TIMEOUT, 30);
-        curl_setopt($objCurl, CURLOPT_MAXREDIRS, 10);
+        curl_setopt($objCurl, CURLOPT_MAXREDIRS, 3);
 
         $returnValue = curl_exec($objCurl);
         $returnCode = curl_getinfo($objCurl, CURLINFO_HTTP_CODE);
@@ -247,6 +247,11 @@ class PublicKeyGrabberModule extends Module
      */
     protected function getPublicKeysFromPageContent($content)
     {
+        $content = preg_replace(
+            ['/<\/pre>\n+/'],
+            ['</pre>'],
+            $content
+        );
         $content = explode('</pre><hr /><pre>', $content);
 
         //Shift the beginning off of the array
@@ -282,8 +287,11 @@ class PublicKeyGrabberModule extends Module
         $elementDetails = [];
 
         $element = trim($element);
-        $element = preg_replace('/\n/', ' ', $element);
-        $element = preg_replace('/\s+/', ' ', $element);
+        $element = preg_replace(
+            ['/<strong>/', '/<\/strong>/', '/\n/', '/\s+/'],
+            ['', '', ' ', ' '],
+            $element
+        );
 
         // BSPL. $element:
         // pub 4096R/A11FE1C8 2016-07-04 Kristina Ivanova <kristina.ivanova@trilobit.de> Fingerprint=2AE6 D1AE 7F0A AA8D A9DE 6F9C 33A7 3086 A11F E1C8
@@ -293,7 +301,7 @@ class PublicKeyGrabberModule extends Module
      Fingerprint=2055 32BE 5B85 85C5 57D1  56EF 115B 2B7E 8BAE A4C5
         */
         preg_match_all(
-              '/^.*?pub\s(.*?)\/'
+              '/^pub\s(.*?)\/'
             .'<a.*?href="(.*?)".*?>(.*?)<\/a>\s'
             .'(.*?)\s'
             .'<a.*?href="(.*?)".*?>(.*?) \&lt;(.*?)\&gt;<\/a>\s*.*\s*'

@@ -4,7 +4,7 @@ $header = <<<EOF
 @copyright  trilobit GmbH
 @author     trilobit GmbH <https://github.com/trilobit-gmbh>
 @license    LGPL-3.0-or-later
-@link       http://github.com/trilobit-gmbh/contao-pkg-bundle
+@link       http://github.com/trilobit-gmbh/contao-ajaxpagination-bundle
 EOF;
 return PhpCsFixer\Config::create()
     ->setRiskyAllowed(true)
