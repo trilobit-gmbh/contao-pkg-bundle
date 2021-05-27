@@ -180,21 +180,21 @@ class PublicKeyGrabberModule extends Module
     {
         $objCurl = curl_init();
 
-        curl_setopt($objCurl, CURLOPT_URL, $strApiUrl);
+        curl_setopt($objCurl, \CURLOPT_URL, $strApiUrl);
 
-        curl_setopt($objCurl, CURLOPT_USERAGENT, 'Contao PKG API');
-        curl_setopt($objCurl, CURLOPT_COOKIEJAR, TL_ROOT.'/system/tmp/curl.cookiejar.txt');
-        curl_setopt($objCurl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($objCurl, CURLOPT_ENCODING, '');
-        curl_setopt($objCurl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($objCurl, CURLOPT_AUTOREFERER, true);
-        curl_setopt($objCurl, CURLOPT_SSL_VERIFYPEER, false);    // required for https urls
-        curl_setopt($objCurl, CURLOPT_CONNECTTIMEOUT, 30);
-        curl_setopt($objCurl, CURLOPT_TIMEOUT, 30);
-        curl_setopt($objCurl, CURLOPT_MAXREDIRS, 3);
+        curl_setopt($objCurl, \CURLOPT_USERAGENT, 'Contao PKG API');
+        curl_setopt($objCurl, \CURLOPT_COOKIEJAR, TL_ROOT.'/system/tmp/curl.cookiejar.txt');
+        curl_setopt($objCurl, \CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($objCurl, \CURLOPT_ENCODING, '');
+        curl_setopt($objCurl, \CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($objCurl, \CURLOPT_AUTOREFERER, true);
+        curl_setopt($objCurl, \CURLOPT_SSL_VERIFYPEER, false);    // required for https urls
+        curl_setopt($objCurl, \CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($objCurl, \CURLOPT_TIMEOUT, 30);
+        curl_setopt($objCurl, \CURLOPT_MAXREDIRS, 3);
 
         $returnValue = curl_exec($objCurl);
-        $returnCode = curl_getinfo($objCurl, CURLINFO_HTTP_CODE);
+        $returnCode = curl_getinfo($objCurl, \CURLINFO_HTTP_CODE);
 
         curl_close($objCurl);
 
@@ -310,10 +310,17 @@ class PublicKeyGrabberModule extends Module
             $arrMatch
         );
 
-        $elementDetails['name'] = $arrMatch[6][0];
-        $elementDetails['email'] = $arrMatch[7][0];
+        $elementDetails['type'] = 'pub';
+        $elementDetails['bits'] = $arrMatch[1][0];
+
         $elementDetails['url'] = $arrMatch[2][0];
         $elementDetails['pki'] = $arrMatch[3][0];
+
+        $elementDetails['date'] = $arrMatch[4][0];
+
+        $elementDetails['name'] = $arrMatch[6][0];
+        $elementDetails['email'] = $arrMatch[7][0];
+
         $elementDetails['fingerprint'] = $arrMatch[8][0];
 
         return $elementDetails;

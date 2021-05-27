@@ -16,12 +16,12 @@ $GLOBALS['TL_LANG']['tl_module']['publickeygrabberTpl'] = [
 
 $GLOBALS['TL_LANG']['tl_module']['pkgHost'] = [
     'Public Keyserver URL',
-    'Geben Sie hier bitte den Public Keyserver ein, auf dem nach Ihren Schlüsseln gesucht werden soll.',
+    'Geben Sie hier bitte den Public Keyserver ein (z.B. http://keys.gnupg.net:11371), auf dem nach Ihren Schlüsseln gesucht werden soll.',
 ];
 
 $GLOBALS['TL_LANG']['tl_module']['pkgHostFallback'] = [
     'Fallback Keyserver URL',
-    'Falls der nebenstehende Public Keyserver nicht erreicht werden kann, versuchen wir diesen zu kontaktieren.',
+    'Falls der nebenstehende Public Keyserver nicht erreicht werden kann, versuchen wir diesen (z.B. http://keys.openpgp.org:11371) zu kontaktieren.',
 ];
 $GLOBALS['TL_LANG']['tl_module']['pkgEmailDomain'] = [
     'Domain',
@@ -29,7 +29,7 @@ $GLOBALS['TL_LANG']['tl_module']['pkgEmailDomain'] = [
 ];
 
 $GLOBALS['TL_LANG']['tl_module']['pkgBlacklistedEmails'] = [
-    'Blacklist',
+    'Negativliste',
     'Bitte geben Sie hier die E-Mail-Adressen ein, die sie verbergen möchten.',
     'columnEmail' => [
         'E-Mail-Adresse',
