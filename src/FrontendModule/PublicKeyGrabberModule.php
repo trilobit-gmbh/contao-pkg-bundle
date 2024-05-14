@@ -101,14 +101,22 @@ class PublicKeyGrabberModule extends Module
                 '<hr />',
                 $this->getSearchResults()
             );
+            $result = [
+                'response' => explode(
+                    '<hr />',
+                    $this->getSearchResults()
+                ),
+                'pkgHost' => $this->pkgHost,
+                'pkgEmailDomain' => $this->pkgEmailDomain,
+            ];
 
             File::putContent($cacheFile, json_encode($result));
         }
 
         $data = [];
 
-        foreach ($result as $key => $value) {
-            $tmp = $this->getPublicKeyData($this->applyFilters(trim(strip_tags($value))));
+        foreach ($result['response'] as $key => $value) {
+            $tmp = $this->getPublicKeyData($this->applyFilters(trim(strip_tags($value))), $result['pkgHost'], $result['pkgEmailDomain']);
 
             if (!empty($tmp)) {
                 $data[$tmp['name'] ?? $key] = $tmp;
@@ -153,7 +161,7 @@ class PublicKeyGrabberModule extends Module
 
     protected function getSearchResults(): string
     {
-        $response = $this->sendKeyserverRequest($this->pkgHost.'/'.sprintf(self::KEYSERVER_SEARCH_URL, $this->pkgEmailDomain));
+        $response = $this->sendKeyserverRequest($this->pkgHost.'/'.sprintf(self::KEYSERVER_SEARCH_URL, $this->pkgEmailDomain, $this->pkgEmailDomain));
         $this->keyServer = $this->pkgHost;
 
         if (200 !== $response['status']) {
@@ -182,7 +190,7 @@ class PublicKeyGrabberModule extends Module
         return $buffer;
     }
 
-    protected function getPublicKeyData(string $buffer): array
+    protected function getPublicKeyData(string $buffer, string $pkgHost, string $pkgEmailDomain): array
     {
         $buffer = str_replace(
             [
@@ -225,7 +233,7 @@ class PublicKeyGrabberModule extends Module
 
         if (!isset($matches[3][0]) && !isset($matches[4][0])) {
             preg_match_all(
-                '/(.*)pub:(.*?)::uid:(.*?)\s<(.*?)>:.*/si',
+                '/(.*)pub:(.*?):.*?::uid:(.*?)\s<(.*?)>:.*/si',
                 $buffer,
                 $matches
             );
@@ -243,9 +251,11 @@ class PublicKeyGrabberModule extends Module
             'raw' => $buffer,
             'name' => $matches[3][0] ?? '',
             'email' => $matches[4][0] ?? '',
-            'url' => sprintf(self::KEYSERVER_SEARCH_URL, $matches[2][0] ?? ''),
+            'url' => $pkgHost.'/'.sprintf(self::KEYSERVER_SEARCH_URL, $matches[2][0] ?? ''),
             'pki' => $matches[1][0] ?? '',
             'fingerprint' => $matches[2][0] ?? '',
+            'pkgHost' => $pkgHost,
+            'pkgEmailDomain' => $pkgEmailDomain,
         ];
     }
 
