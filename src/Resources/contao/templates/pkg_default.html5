@@ -1,13 +1,19 @@
-<?php if (count($this->items)): ?>
+<?php declare(strict_types=1);
+if (count($this->items)) { ?>
     <ul>
-        <?php foreach ($this->items as $publicKeyElement): ?>
+        <?php foreach ($this->items as $value) { ?>
             <li>
-                <?= $publicKeyElement['name'] ?><br>
-                {{email::<?= $publicKeyElement['email'] ?>}}<br>
-                <a href="<?= $this->currentKeyServer . $publicKeyElement['url'] ?>" rel="nofollow" rel=”noopener” oder rel=”noreferrer”>
-                    <?= $publicKeyElement['pki'] ?>
+                <?= $value['name']; ?><br>
+                {{email::<?= $value['email']; ?>}}<br>
+
+                <a href="<?= $this->keyServer.$value['url']; ?>"
+                   rel="nofollow noopener noreferrer"
+                   title="<?= $value['pki']; ?>"
+                >
+                    Fingerprint
+                    [<?= $value['fingerprint']; ?>]
                 </a>
             </li>
-        <?php endforeach ?>
+        <?php } ?>
     </ul>
-<?php endif; ?>
+<?php } ?>

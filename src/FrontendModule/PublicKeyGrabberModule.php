@@ -1,19 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright  trilobit GmbH
  * @author     trilobit GmbH <https://github.com/trilobit-gmbh>
  * @license    LGPL-3.0-or-later
- * @link       http://github.com/trilobit-gmbh/contao-pkg-bundle
  */
 
 namespace Trilobit\PkgBundle\FrontendModule;
 
-use Contao\BackendTemplate;
 use Contao\FrontendTemplate;
 use Contao\Module;
 use Contao\StringUtil;
-use Patchwork\Utf8;
 
 /**
  * Provides Public Key Grabbing by querying keyservers for domain @domain.tld.
@@ -22,9 +21,10 @@ use Patchwork\Utf8;
  */
 class PublicKeyGrabberModule extends Module
 {
-    const KEYSERVER_SEARCH_URL = '/pks/lookup?op=index&search=%s&fingerprint=on';
+    public const KEYSERVER_SEARCH_URL = 'pks/lookup?op=index&search=%s';
 
-    const KEY_REVOKED_MARKER = '*** KEY REVOKED ***';
+    // const KEY_REVOKED_MARKER = '*** KEY REVOKED ***';
+    public const KEY_REVOKED_MARKER = 'revok';
 
     /**
      * @var string
@@ -34,110 +34,13 @@ class PublicKeyGrabberModule extends Module
     /**
      * @var string
      */
-    protected $strCurrentKeyServer;
+    protected $keyServer;
 
-    /**
-     * @return string
-     */
-    public function getKeyserverUrl()
-    {
-        return $this->pkgHost;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFallbackKeyserverUrl()
-    {
-        return $this->pkgHostFallback;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSearchDomain()
-    {
-        return $this->pkgEmailDomain;
-    }
-
-    /**
-     * @return array
-     */
-    public function getBlacklistedEmails()
-    {
-        $arrBlacklistedEmails = [];
-
-        foreach (StringUtil::deserialize($this->pkgBlacklistedEmails, true) as $pkgBlacklistEntry) {
-            $arrBlacklistedEmails[] = $pkgBlacklistEntry['pkgBlacklistedEmails'];
-        }
-
-        return $arrBlacklistedEmails;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFilters()
-    {
-        $arrPkgFilters = [];
-
-        foreach (StringUtil::deserialize($this->pkgFilters, true) as $pkgFilterEntry) {
-            $arrPkgFilters[] = $pkgFilterEntry['pkgFilters'];
-        }
-
-        return $arrPkgFilters;
-    }
-
-    /**
-     * @return string
-     */
-    public function getKeyserverUrlFragment()
-    {
-        return sprintf(self::KEYSERVER_SEARCH_URL, $this->getSearchDomain());
-    }
-
-    /**
-     * Display a wildcard in the back end.
-     *
-     * @return string
-     */
     public function generate()
     {
-        if (TL_MODE === 'BE') {
-            $objTemplate = new BackendTemplate('be_wildcard');
-            $objTemplate->wildcard = '### '.Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['pkg'][0]).' ###';
-            $objTemplate->title = $this->headline;
-            $objTemplate->id = $this->id;
-            $objTemplate->link = $this->name;
-            $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id='.$this->id;
-
-            return $objTemplate->parse();
-        }
-
         return parent::generate();
     }
 
-    /**
-     * Retrieve public keys from keyserver and return them as specified.
-     *
-     * @throws \Exception
-     *
-     * @return array|string
-     */
-    public function getPublicKeys()
-    {
-        $content = $this->getPageContent();
-
-        $publicKeyList = $this->getPublicKeysFromPageContent($content);
-
-        $publicKeyList = $this->stripForbidden($publicKeyList);
-
-        return $publicKeyList;
-    }
-
-    /**
-     * Generate module.
-     */
     protected function compile()
     {
         $strCustomTemplate = 'pkg_default';
@@ -148,84 +51,100 @@ class PublicKeyGrabberModule extends Module
 
         $objTemplate = new FrontendTemplate($strCustomTemplate);
         $objTemplate->setData($this->arrData);
+
         $objTemplate->items = $this->getPublicKeys();
-        $objTemplate->currentKeyServer = $this->strCurrentKeyServer;
+
+        $objTemplate->keyServer = $this->keyServer;
 
         $this->Template->gpgKeys = $objTemplate->parse();
-        $this->Template->currentKeyServer = $this->strCurrentKeyServer;
+
+        $this->Template->request = $this->pkgHost.'/'.sprintf(self::KEYSERVER_SEARCH_URL, $this->pkgEmailDomain);
+        $this->Template->keyServer = $this->keyServer;
+        $this->Template->filterList = array_filter(array_map(
+            static function($item) {
+                return $item['pkgFilters'] ?? '';
+            },
+            StringUtil::deserialize($this->pkgFilters, true)
+        ));
+        $this->Template->notAllowedList = array_filter(array_map(
+            static function($item) {
+                return $item['pkgBlacklistedEmails'] ?? '';
+            },
+            StringUtil::deserialize($this->pkgBlacklistedEmails, true)
+        ));
     }
 
-    /**
-     * Strips forbidden (blacklisted or revoked) keys from result.
-     *
-     * @return array
-     */
-    protected function stripForbidden(array $publicKeyList)
+    public function getPublicKeys(): array
     {
-        foreach ($publicKeyList as $listElementKey => $listElementValue) {
-            if (false === $listElementValue['allowed']) {
-                unset($publicKeyList[$listElementKey]);
+        $data = [];
+
+        foreach (explode(
+            '<hr />',
+            $this->getSearchResults()
+        ) as $key => $value) {
+            $tmp = $this->getPublicKeyData($this->applyFilters(trim(strip_tags($value))));
+
+            if (!empty($tmp)) {
+                $data[$tmp['name'] ?? $key] = $tmp;
             }
         }
 
-        return $publicKeyList;
+        $data = array_filter($data);
+
+        ksort($data);
+
+        return $data;
     }
 
-    /**
-     * @param $strApiUrl
-     *
-     * @return array
-     */
-    protected function apiCall($strApiUrl)
+    protected function sendKeyserverRequest($url): array
     {
         $objCurl = curl_init();
 
-        curl_setopt($objCurl, CURLOPT_URL, $strApiUrl);
+        curl_setopt($objCurl, \CURLOPT_URL, $url);
 
-        curl_setopt($objCurl, CURLOPT_USERAGENT, 'Contao PKG API');
-        curl_setopt($objCurl, CURLOPT_COOKIEJAR, TL_ROOT.'/system/tmp/curl.cookiejar.txt');
-        curl_setopt($objCurl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($objCurl, CURLOPT_ENCODING, '');
-        curl_setopt($objCurl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($objCurl, CURLOPT_AUTOREFERER, true);
-        curl_setopt($objCurl, CURLOPT_SSL_VERIFYPEER, false);    // required for https urls
-        curl_setopt($objCurl, CURLOPT_CONNECTTIMEOUT, 30);
-        curl_setopt($objCurl, CURLOPT_TIMEOUT, 30);
-        curl_setopt($objCurl, CURLOPT_MAXREDIRS, 3);
+        curl_setopt($objCurl, \CURLOPT_USERAGENT, 'Contao PKG API');
+        curl_setopt($objCurl, \CURLOPT_COOKIEJAR, TL_ROOT.'/system/tmp/curl.cookiejar.txt');
+        curl_setopt($objCurl, \CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($objCurl, \CURLOPT_ENCODING, '');
+        curl_setopt($objCurl, \CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($objCurl, \CURLOPT_AUTOREFERER, true);
+        curl_setopt($objCurl, \CURLOPT_SSL_VERIFYPEER, false);    // required for https urls
+        curl_setopt($objCurl, \CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($objCurl, \CURLOPT_TIMEOUT, 30);
+        curl_setopt($objCurl, \CURLOPT_MAXREDIRS, 3);
 
         $returnValue = curl_exec($objCurl);
-        $returnCode = curl_getinfo($objCurl, CURLINFO_HTTP_CODE);
+        $status = curl_getinfo($objCurl, \CURLINFO_HTTP_CODE);
 
         curl_close($objCurl);
 
         return [
-            'HTTP_CODE' => $returnCode,
-            'CONTENT' => $returnValue,
+            'status' => $status,
+            'body' => $returnValue,
+            'request_url' => $url,
         ];
     }
 
-    /**
-     * Retrieves content with public keys from keyserver page.
-     *
-     * @throws \Exception
-     *
-     * @return string
-     */
-    protected function getPageContent()
+    protected function getSearchResults(): string
     {
-        $this->strCurrentKeyServer = $this->getKeyserverUrl();
+        // todo: cache result
+        $response = $this->sendKeyserverRequest($this->pkgHost.'/'.sprintf(self::KEYSERVER_SEARCH_URL, $this->pkgEmailDomain));
+        $this->keyServer = $this->pkgHost;
 
-        $apiFeedback = $this->apiCall($this->strCurrentKeyServer.$this->getKeyserverUrlFragment());
-        $pageContent = $apiFeedback['CONTENT'];
+        if (200 !== $response['status']) {
+            return '';
+        }
 
-        if (false === $pageContent) {
-            $this->strCurrentKeyServer = $this->getFallbackKeyserverUrl();
+        $buffer = $response['body'];
 
-            if (!empty($this->strCurrentKeyServer)) {
-                $apiFeedback = $this->apiCall($this->strCurrentKeyServer.$this->getKeyserverUrlFragment());
-                $pageContent = $apiFeedback['CONTENT'];
+        if (false === $buffer) {
+            if (!empty($this->pkgHostFallback)) {
+                $response = $this->sendKeyserverRequest($this->pkgHostFallback.'/'.sprintf(self::KEYSERVER_SEARCH_URL, $this->pkgEmailDomain));
+                $this->keyServer = $this->pkgHostFallback;
 
-                if (false === $pageContent) {
+                $buffer = $response['body'];
+
+                if (false === $buffer) {
                     try {
                         throw new \Exception('Keyserver page could not be opened');
                     } catch (\Exception $e) {
@@ -235,169 +154,106 @@ class PublicKeyGrabberModule extends Module
             }
         }
 
-        return $pageContent;
+        return $buffer;
     }
 
-    /**
-     * Retrieves Public Key Information from Keyserver page content.
-     *
-     * @param string $content
-     *
-     * @return array
-     */
-    protected function getPublicKeysFromPageContent($content)
+    protected function getPublicKeyData(string $buffer): array
     {
-        $content = preg_replace(
-            ['/<\/pre>\n+/'],
-            ['</pre>'],
-            $content
-        );
-        $content = explode('</pre><hr /><pre>', $content);
-
-        //Shift the beginning off of the array
-        array_shift($content);
-
-        $publicKeyList = [];
-
-        foreach ($content as $element) {
-            $element = $this->applyFilters($element);
-
-            $elementDetails = $this->getElementDetails($element);
-
-            $elementDetails['allowed'] = $this->isPublicKeyAllowed($element);
-
-            $publicKeyList[] = $elementDetails;
-        }
-
-        sort($publicKeyList);
-
-        return $publicKeyList;
-    }
-
-    /**
-     * Retrieves Detail Information from Element.
-     *
-     * @param string $element
-     *
-     * @return array
-     */
-    protected function getElementDetails($element)
-    {
-        $arrMatch = [];
-        $elementDetails = [];
-
-        $element = trim($element);
-        $element = preg_replace(
-            ['/<strong>/', '/<\/strong>/', '/\n/', '/\s+/'],
-            ['', '', ' ', ' '],
-            $element
+        $buffer = str_replace(
+            [
+                '&lt;',
+                '&gt;',
+                '%3C',
+                '%3E',
+                '%20',
+                '&#13;',
+                "\r",
+                "\n",
+            ],
+            [
+                '<',
+                '>',
+                '<',
+                '>',
+                ' ',
+                '',
+                '',
+            ],
+            $buffer
         );
 
-        // BSPL. $element:
-        // pub 4096R/A11FE1C8 2016-07-04 Kristina Ivanova <kristina.ivanova@trilobit.de> Fingerprint=2AE6 D1AE 7F0A AA8D A9DE 6F9C 33A7 3086 A11F E1C8
-        /*
-        pub  1024D/<a href="/pks/lookup?op=get&amp;search=0x115B2B7E8BAEA4C5">8BAEA4C5</a> 2005-03-29 <ahref="/pks/lookup?op=vindex&amp;fingerprint=on&amp;search=0x115B2B7E8BAEA4C5">Oliver Reiff, trilobit (Trilobit GmbH) &lt;Oliver.Reiff@trilobit.de&gt;</a>
-                               trilobit GmbH &lt;info@trilobit.de&gt;
-     Fingerprint=2055 32BE 5B85 85C5 57D1  56EF 115B 2B7E 8BAE A4C5
-        */
         preg_match_all(
-              '/^pub\s(.*?)\/'
-            .'<a.*?href="(.*?)".*?>(.*?)<\/a>\s'
-            .'(.*?)\s'
-            .'<a.*?href="(.*?)".*?>(.*?) \&lt;(.*?)\&gt;<\/a>\s*.*\s*'
-            .'Fingerprint\=(.*?)$/i',
-            $element,
-            $arrMatch
+            '/^.*?(sig\s'.self::KEY_REVOKED_MARKER.')\s.*$/si',
+            $buffer,
+            $matches
         );
 
-        $elementDetails['name'] = $arrMatch[6][0];
-        $elementDetails['email'] = $arrMatch[7][0];
-        $elementDetails['url'] = $arrMatch[2][0];
-        $elementDetails['pki'] = $arrMatch[3][0];
-        $elementDetails['fingerprint'] = $arrMatch[8][0];
-
-        return $elementDetails;
-    }
-
-    /**
-     * Checks public keys for being either revoked and/or blacklisted.
-     *
-     * @param string $element
-     *
-     * @return bool
-     */
-    protected function isPublicKeyAllowed($element)
-    {
-        if (true === $this->isPublicKeyRevoked($element)) {
-            return false;
+        if (isset($matches[1][0]) && 'sig '.self::KEY_REVOKED_MARKER === $matches[1][0]) {
+            return [];
         }
 
-        if (true === $this->isPublicKeyBlacklisted($element)) {
-            return false;
+        preg_match_all(
+            '/^.*pub\s(.*?\/(.*?))\s.*?uid\s(.*?)\s<(.*?)>.*?sig\s.*$/si',
+            $buffer,
+            $matches
+        );
+
+        if (!isset($matches[3][0]) && !isset($matches[4][0])) {
+            preg_match_all(
+                '/(.*)pub:(.*?)::uid:(.*?)\s<(.*?)>:.*/si',
+                $buffer,
+                $matches
+            );
+
+            if (!isset($matches[3][0]) && !isset($matches[4][0])) {
+                return [];
+            }
+        }
+
+        if (false === $this->isAllowed($matches[4][0] ?? '')) {
+            return [];
+        }
+
+        return [
+            'raw' => $buffer,
+            'name' => $matches[3][0] ?? '',
+            'email' => $matches[4][0] ?? '',
+            'url' => sprintf(self::KEYSERVER_SEARCH_URL, $matches[2][0] ?? ''),
+            'pki' => $matches[1][0] ?? '',
+            'fingerprint' => $matches[2][0] ?? '',
+        ];
+    }
+
+    protected function isAllowed(string $item): bool
+    {
+        if (empty($item)) {
+            return true;
+        }
+
+        foreach (StringUtil::deserialize($this->pkgBlacklistedEmails, true) as $value) {
+            if (!empty($value['pkgBlacklistedEmails']) && false !== stripos($item, $value['pkgBlacklistedEmails'])) {
+                return false;
+            }
         }
 
         return true;
     }
 
-    /**
-     * Checks public key for revoked markers.
-     *
-     * @param string $element
-     *
-     * @return bool
-     */
-    protected function isPublicKeyRevoked($element)
+    protected function applyFilters(string $item): string
     {
-        if (false !== stripos($element, self::KEY_REVOKED_MARKER)) {
-            return true;
+        $filters = [];
+
+        foreach (StringUtil::deserialize($this->pkgFilters, true) as $value) {
+            $filters[] = $value['pkgFilters'];
         }
 
-        return false;
-    }
+        array_filter($filters);
 
-    /**
-     * Checks public key for manual blacklisting.
-     *
-     * @param string $element
-     *
-     * @return bool
-     */
-    protected function isPublicKeyBlacklisted($element)
-    {
-        foreach ($this->getBlacklistedEmails() as $blacklistedEmail) {
-            if (false !== stripos($element, $blacklistedEmail)) {
-                return true;
-            }
+        foreach ($filters as $value) {
+            $value = html_entity_decode($value);
+            $item = str_ireplace($value, '', $item);
         }
 
-        return false;
-    }
-
-    /**
-     * @param string $element
-     *
-     * @return string
-     */
-    protected function applyFilters($element)
-    {
-        foreach ($this->getFilters() as $filter) {
-            $filter = html_entity_decode($filter);
-            $element = $this->filterElement($element, $filter);
-        }
-
-        return $element;
-    }
-
-    /**
-     * Filters strings out of elements.
-     *
-     * @param string $element
-     * @param string $stringToFilter
-     *
-     * @return string
-     */
-    protected function filterElement($element, $stringToFilter)
-    {
-        return $element = str_ireplace($stringToFilter, '', $element);
+        return $item;
     }
 }

@@ -1,7 +1,9 @@
-<?php $this->extend('block_searchable'); ?>
+<?php declare(strict_types=1);
+$this->extend('block_searchable'); ?>
 
 <?php $this->block('content'); ?>
 
-<?= $this->gpgKeys ?>
+<p class="invisible"><?= $this->request; ?></p>
+<?= $this->gpgKeys; ?>
 
 <?php $this->endblock(); ?>

@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright  trilobit GmbH
  * @author     trilobit GmbH <https://github.com/trilobit-gmbh>
  * @license    LGPL-3.0-or-later
- * @link       http://github.com/trilobit-gmbh/contao-pkg-bundle
  */
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['pkg'] = '{title_legend},name,headline,type;{template_legend:hide},publickeygrabberTpl,customTpl;{publickeygrabber_legend},pkgHost,pkgHostFallback,pkgEmailDomain,pkgBlacklistedEmails,pkgFilters;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
@@ -13,7 +14,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['publickeygrabberTpl'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['publickeygrabberTpl'],
     'exclude' => true,
     'inputType' => 'select',
-    'options_callback' => function () { return $this->getTemplateGroup('pkg_'); },
+    'options_callback' => function() { return $this->getTemplateGroup('pkg_'); },
     'eval' => ['chosen' => true, 'tl_class' => 'w50'],
     'sql' => "varchar(64) NOT NULL default ''",
 ];
