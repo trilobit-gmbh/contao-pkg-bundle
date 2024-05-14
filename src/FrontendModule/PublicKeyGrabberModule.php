@@ -12,7 +12,6 @@ namespace Trilobit\PkgBundle\FrontendModule;
 
 use Contao\File;
 use Contao\FrontendTemplate;
-use Contao\Input;
 use Contao\Module;
 use Contao\StringUtil;
 use Contao\System;
