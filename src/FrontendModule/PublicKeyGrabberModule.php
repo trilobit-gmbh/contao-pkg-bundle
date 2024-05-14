@@ -10,9 +10,12 @@ declare(strict_types=1);
 
 namespace Trilobit\PkgBundle\FrontendModule;
 
+use Contao\File;
 use Contao\FrontendTemplate;
+use Contao\Input;
 use Contao\Module;
 use Contao\StringUtil;
+use Contao\System;
 
 /**
  * Provides Public Key Grabbing by querying keyservers for domain @domain.tld.
@@ -76,12 +79,36 @@ class PublicKeyGrabberModule extends Module
 
     public function getPublicKeys(): array
     {
+        $container = System::getContainer();
+
+        $cacheDir = $container->getParameter('kernel.cache_dir');
+        $rootDir = $container->getParameter('kernel.project_dir');
+
+        $cacheFile = StringUtil::stripRootDir($cacheDir).'/trilobit/pkg_'.md5($this->pkgEmailDomain).'.json';
+
+        $result = [];
+        if (file_exists($rootDir.'/'.$cacheFile)) {
+            $cache = new File($cacheFile);
+
+            if ($cache->mtime > time() - 60 * 60 * 24) {
+                $result = json_decode($cache->getContent(), true);
+            } else {
+                $cache->delete();
+            }
+        }
+
+        if (empty($result)) {
+            $result = explode(
+                '<hr />',
+                $this->getSearchResults()
+            );
+
+            File::putContent($cacheFile, json_encode($result));
+        }
+
         $data = [];
 
-        foreach (explode(
-            '<hr />',
-            $this->getSearchResults()
-        ) as $key => $value) {
+        foreach ($result as $key => $value) {
             $tmp = $this->getPublicKeyData($this->applyFilters(trim(strip_tags($value))));
 
             if (!empty($tmp)) {
@@ -127,7 +154,6 @@ class PublicKeyGrabberModule extends Module
 
     protected function getSearchResults(): string
     {
-        // todo: cache result
         $response = $this->sendKeyserverRequest($this->pkgHost.'/'.sprintf(self::KEYSERVER_SEARCH_URL, $this->pkgEmailDomain));
         $this->keyServer = $this->pkgHost;
 
