@@ -254,6 +254,8 @@ class PublicKeyGrabberModule extends Module
                     }
                 }
             }
+        } else {
+            $this->keyServer = $result['cache']['request']['server'];
         }
 
         if (200 !== $result['status']) {
@@ -270,26 +272,7 @@ class PublicKeyGrabberModule extends Module
             ]
         );
 
-        $buffer = $result['body'];
-
-        if (false === $buffer) {
-            if (!empty($this->pkgHostFallback)) {
-                $response = $this->sendRequest($this->pkgHostFallback.'/'.\sprintf(self::KEYSERVER_SEARCH_URL, $this->pkgEmailDomain));
-                $this->keyServer = $this->pkgHostFallback;
-
-                $buffer = $response['body'];
-
-                if (false === $buffer) {
-                    try {
-                        throw new \Exception('Keyserver page could not be opened');
-                    } catch (\Exception $e) {
-                        return $e->getMessage();
-                    }
-                }
-            }
-        }
-
-        return $buffer;
+        return $result['body'];
     }
 
     protected function getPublicKeyData(string $buffer, string $pkgHost, string $pkgEmailDomain): array
