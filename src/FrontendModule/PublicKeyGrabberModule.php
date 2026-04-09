@@ -84,45 +84,13 @@ class PublicKeyGrabberModule extends Module
 
     public function getPublicKeys(): array
     {
-        $container = System::getContainer();
-
-        $cacheDir = $container->getParameter('kernel.cache_dir');
-        $rootDir = $container->getParameter('kernel.project_dir');
-
-        $cacheFile = StringUtil::stripRootDir($cacheDir).'/trilobit/pkg_'.md5($this->pkgEmailDomain).'.json';
-
-        $result = [];
-        if (file_exists($rootDir.'/'.$cacheFile)) {
-            $cache = new File($cacheFile);
-
-            if ($cache->mtime > time() - 60 * 60 * 24) {
-                $result = json_decode($cache->getContent(), true);
-            } else {
-                $cache->delete();
-            }
-        }
-
-        if (empty($result)) {
-            $result = explode(
-                '<hr />',
-                $this->getSearchResults()
-            );
-            $result = [
-                'response' => explode(
-                    '<hr />',
-                    $this->getSearchResults()
-                ),
-                'pkgHost' => $this->pkgHost,
-                'pkgEmailDomain' => $this->pkgEmailDomain,
-            ];
-
-            File::putContent($cacheFile, json_encode($result));
-        }
-
         $data = [];
 
-        foreach ($result['response'] as $key => $value) {
-            $tmp = $this->getPublicKeyData($this->applyFilters(trim(strip_tags($value))), $result['pkgHost'], $result['pkgEmailDomain']);
+        foreach (explode(
+            '<hr />',
+            $this->getSearchResults()
+        ) as $key => $value) {
+            $tmp = $this->getPublicKeyData($this->applyFilters(trim(strip_tags($value))));
 
             if (!empty($tmp)) {
                 $data[$tmp['name'] ?? $key] = $tmp;
@@ -275,7 +243,7 @@ class PublicKeyGrabberModule extends Module
         return $result['body'];
     }
 
-    protected function getPublicKeyData(string $buffer, string $pkgHost, string $pkgEmailDomain): array
+    protected function getPublicKeyData(string $buffer): array
     {
         $buffer = str_replace(
             [
@@ -336,11 +304,9 @@ class PublicKeyGrabberModule extends Module
             'raw' => $buffer,
             'name' => $matches[3][0] ?? '',
             'email' => $matches[4][0] ?? '',
-            'url' => \sprintf(self::KEYSERVER_SEARCH_URL, $matches[2][0] ?? ''),
+            'url' => $this->keyServer.'/'.\sprintf(self::KEYSERVER_SEARCH_URL, $matches[2][0] ?? ''),
             'pki' => $matches[1][0] ?? '',
             'fingerprint' => $matches[2][0] ?? '',
-            'pkgHost' => $pkgHost,
-            'pkgEmailDomain' => $pkgEmailDomain,
         ];
     }
 

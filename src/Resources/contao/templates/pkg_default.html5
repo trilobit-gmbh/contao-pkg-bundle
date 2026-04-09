@@ -8,16 +8,18 @@ if (count($this->items)) { ?>
                 {{email::<?= $value['email']; ?>}}<br>
 
                 Fingerprint: <a href="<?= $value['url']; ?>"
-                   rel="nofollow noopener noreferrer"
-                   title="<?= $value['pki']; ?>"
+                    rel="nofollow noopener noreferrer"
+                    title="<?= $value['pki']; ?>"
+                    target="_blank"
                 >
                     <?= $value['fingerprint']; ?>
                 </a><br>
-                Public Key Server: <a href="<?= $value['pkgHost']; ?>"
+                Public Key Server: <a href="<?= $this->keyServer; ?>"
                     rel="nofollow noopener noreferrer"
-                    title="<?= $value['pkgHost']; ?>"
+                    title="<?= $this->keyServer; ?>"
+                    target="_blank"
                 >
-                    <?= $value['pkgHost']; ?>
+                    <?= $this->keyServer; ?>
                 </a>
             </li>
         <?php } ?>
