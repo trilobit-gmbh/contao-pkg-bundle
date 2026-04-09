@@ -11,7 +11,6 @@ declare(strict_types=1);
 $GLOBALS['TL_DCA']['tl_module']['palettes']['pkg'] = '{title_legend},name,headline,type;{template_legend:hide},publickeygrabberTpl,customTpl;{publickeygrabber_legend},pkgHost,pkgHostFallback,pkgEmailDomain,pkgBlacklistedEmails,pkgFilters;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['publickeygrabberTpl'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['publickeygrabberTpl'],
     'exclude' => true,
     'inputType' => 'select',
     'options_callback' => function() { return $this->getTemplateGroup('pkg_'); },
@@ -20,23 +19,22 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['publickeygrabberTpl'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['pkgHost'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['pkgHost'],
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
     'eval' => ['mandatory' => true, 'rgxp' => 'url', 'tl_class' => 'w50'],
+    'default' => 'http://keys.gnupg.net:11371',
     'sql' => 'mediumtext NULL',
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['pkgHostFallback'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['pkgHostFallback'],
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
     'eval' => ['rgxp' => 'url', 'tl_class' => 'w50'],
+    'default' => 'http://keys.openpgp.org:11371',
     'sql' => 'mediumtext NULL',
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['pkgEmailDomain'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['pkgEmailDomain'],
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
@@ -45,7 +43,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['pkgEmailDomain'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['pkgBlacklistedEmails'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['pkgBlacklistedEmails'],
     'exclude' => true,
     'inputType' => 'pkgOptionWizard',
     'sql' => 'blob NULL',
@@ -53,7 +50,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['pkgBlacklistedEmails'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['pkgFilters'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['pkgFilters'],
     'exclude' => true,
     'inputType' => 'pkgOptionWizard',
     'sql' => 'blob NULL',
