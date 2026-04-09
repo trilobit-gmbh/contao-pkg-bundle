@@ -12,8 +12,7 @@
   "require": {
     "php": "^8.0",
     "ext-curl": "*",
-    "contao/core-bundle": "^4.13 || ^5.3",
-    "menatwork/contao-multicolumnwizard-bundle": "^3.4"
+    "contao/core-bundle": "^4.13 || ^5.3"
   },
   "require-dev": {
     "contao/easy-coding-standard": "^3.0",
