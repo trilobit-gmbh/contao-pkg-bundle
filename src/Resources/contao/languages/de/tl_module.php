@@ -26,7 +26,7 @@ $GLOBALS['TL_LANG']['tl_module']['pkgHostFallback'] = [
 ];
 $GLOBALS['TL_LANG']['tl_module']['pkgEmailDomain'] = [
     'Domain',
-    'Die Domain deren Keys dargestellt werden sollen.',
+    'Die Domain, deren Keys dargestellt werden sollen.',
 ];
 
 $GLOBALS['TL_LANG']['tl_module']['pkgBlacklistedEmails'] = [
@@ -39,7 +39,7 @@ $GLOBALS['TL_LANG']['tl_module']['pkgBlacklistedEmails'] = [
 
 $GLOBALS['TL_LANG']['tl_module']['pkgFilters'] = [
     'Filterliste',
-    'Textbausteine die aus der Darstellung herausgefiltert werden sollen.',
+    'Textbausteine, die aus der Darstellung herausgefiltert werden sollen.',
     'columnFilter' => [
         'Textbausteine',
     ],

@@ -44,37 +44,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['pkgEmailDomain'] = [
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['pkgBlacklistedEmails'] = [
     'exclude' => true,
-    'inputType' => 'multiColumnWizard',
+    'inputType' => 'pkgOptionWizard',
     'sql' => 'blob NULL',
-    'eval' => [
-        'tl_class' => 'clr',
-        'columnFields' => [
-            'pkgBlacklistedEmails' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_module']['pkgBlacklistedEmails']['columnEmail'],
-                'exclude' => true,
-                'inputType' => 'text',
-                'eval' => [
-                    'decodeEntities' => true,
-                ],
-            ],
-        ],
-        'buttons' => ['up' => false, 'down' => false],
-    ],
+    'eval' => ['tl_class' => 'clr'],
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['pkgFilters'] = [
     'exclude' => true,
-    'inputType' => 'multiColumnWizard',
+    'inputType' => 'pkgOptionWizard',
     'sql' => 'blob NULL',
-    'eval' => [
-        'tl_class' => 'clr',
-        'columnFields' => [
-            'pkgFilters' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_module']['pkgFilters']['columnFilter'],
-                'exclude' => true,
-                'inputType' => 'text',
-            ],
-        ],
-        'buttons' => ['up' => false, 'down' => false],
-    ],
+    'eval' => ['tl_class' => 'clr'],
 ];
