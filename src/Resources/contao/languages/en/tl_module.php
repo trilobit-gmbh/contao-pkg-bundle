@@ -17,7 +17,7 @@ $GLOBALS['TL_LANG']['tl_module']['publickeygrabberTpl'] = [
 
 $GLOBALS['TL_LANG']['tl_module']['pkgHost'] = [
     'Public Keyserver URL',
-    'Please enter the public keyserver here on which your keys should be searched.',
+    'Please enter the public keyserver here, on which your keys should be searched.',
 ];
 
 $GLOBALS['TL_LANG']['tl_module']['pkgHostFallback'] = [
@@ -26,7 +26,7 @@ $GLOBALS['TL_LANG']['tl_module']['pkgHostFallback'] = [
 ];
 $GLOBALS['TL_LANG']['tl_module']['pkgEmailDomain'] = [
     'Domain',
-    'The domain whose keys are to be displayed.',
+    'The domain, whose keys are to be displayed.',
 ];
 
 $GLOBALS['TL_LANG']['tl_module']['pkgBlacklistedEmails'] = [
@@ -39,7 +39,7 @@ $GLOBALS['TL_LANG']['tl_module']['pkgBlacklistedEmails'] = [
 
 $GLOBALS['TL_LANG']['tl_module']['pkgFilters'] = [
     'Filter list',
-    'Text snippets that should be filtered out of the display.',
+    'Text snippets, that should be filtered out of the display.',
     'columnFilter' => [
         'Text snippets',
     ],
