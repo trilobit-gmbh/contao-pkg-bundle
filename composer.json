@@ -10,8 +10,9 @@
     }
   ],
   "require": {
-    "php": "^7.3 || ^8.0",
-    "contao/core-bundle": "^4.13 || ^5.0",
+    "php": "^8.0",
+    "ext-curl": "*",
+    "contao/core-bundle": "^4.13 || ^5.3",
     "menatwork/contao-multicolumnwizard-bundle": "^3.4"
   },
   "require-dev": {

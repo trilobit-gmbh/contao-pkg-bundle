@@ -9,5 +9,8 @@ declare(strict_types=1);
  */
 
 use Trilobit\PkgBundle\FrontendModule\PublicKeyGrabberModule;
+use Trilobit\PkgBundle\Widget\OptionWizard;
 
 $GLOBALS['FE_MOD']['application']['pkg'] = PublicKeyGrabberModule::class;
+
+$GLOBALS['BE_FFL']['pkgOptionWizard'] = OptionWizard::class;

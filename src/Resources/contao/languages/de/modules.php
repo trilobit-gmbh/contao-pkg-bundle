@@ -10,4 +10,4 @@ declare(strict_types=1);
 
 // MOD
 $GLOBALS['TL_LANG']['FMD']['pkg'][0] = 'Public Key Grabber';
-$GLOBALS['TL_LANG']['FMD']['pkg'][1] = 'Integrate Public Key Grabber as frontend module.';
+$GLOBALS['TL_LANG']['FMD']['pkg'][1] = 'Public Key Grabber als Frontend-Modul einbinden.';

@@ -16,13 +16,13 @@ Mit Hilfe eines asymmetrischen Kryptosystems können Nachrichten in einem Netzwe
 
 In asymmetrischen Kryptosystemen benötigt der Sender für eine verschlüsselte Übermittlung den öffentlichen Schlüssel (Public Key) des Empfängers. Dieser könnte z. B. per E-Mail versandt oder von einer Web-Seite heruntergeladen werden. Dabei muss sichergestellt sein, dass es sich tatsächlich um den Schlüssel des Empfängers handelt und nicht um eine Fälschung eines Betrügers.
 
-Das TrilobitPkgBundle kann auf diese Infrastruktur zugreifen und den öffentlichen Schlüssel zu einer E-MAil-Adresse auslesen und ausgeben.
+Das TrilobitPkgBundle kann auf diese Infrastruktur zugreifen und den öffentlichen Schlüssel zu einer E-Mail-Adresse auslesen und ausgeben.
 
 ---
 
 E-Mail encryption is used to send confidential information by email from the sender to the recipient.
 
-Email encryption often goes hand in hand with the digital signature and is actually combined with it in many standards such as X.509 or PGP. The aim of a digitally signed email is to send information from the sender to the recipient in such a way that the sender can be clearly identified and no one can manipulate the email unnoticed on its way from the sender to the recipient. The email signature thus satisfies the need for authenticity and integrity, but does not ensure confidentiality; this requires encryption. 
+Email encryption often goes hand in hand with the digital signature and is actually combined with it in many standards such as X.509 or PGP. The aim of a digitally signed email is to send information from the sender to the recipient in such a way that the sender can be clearly identified and no one can manipulate the email unnoticed on its way from the sender to the recipient. The email signature thus satisfies the need for authenticity and integrity, but does not ensure confidentiality; this requires encryption.
 
 The most common encountered method of achieving confidentiality and authenticity in email is PKI-based email encryption and signature. PKI stands for public key infrastructure. PKI-based email encryption and signature almost always uses one of the following two standards:
 
@@ -30,7 +30,7 @@ S/MIME: Secure / Multipurpose Internet Mail Extensions
 OpenPGP: Open Pretty Good Privacy
 In cryptology, public key infrastructure (PKI) is a system that can issue, distribute and verify digital certificates. The certificates issued within a PKI are used to secure computer-supported communication.
 
-Using an asymmetric cryptosystem, messages in a network can be digitally signed and encrypted. Secure cryptosystems cannot be broken within a reasonable amount of time, at least according to the current state of knowledge [1], if the parameters (e.g. key length) are selected appropriately, even if the method is known (see Kerckhoff's principle). 
+Using an asymmetric cryptosystem, messages in a network can be digitally signed and encrypted. Secure cryptosystems cannot be broken within a reasonable amount of time, at least according to the current state of knowledge [1], if the parameters (e.g. key length) are selected appropriately, even if the method is known (see Kerckhoff's principle).
 
 In asymmetric cryptosystems, the sender needs the recipient's public key for encrypted transmission. This could e.g. sent via email or downloaded from a website. It must be ensured that it is actually the recipient's key and not a forgery by a fraudster.
 
@@ -41,16 +41,29 @@ Quellen:
 * https://de.wikipedia.org/wiki/Public-Key-Infrastruktur
 
 
-Backend Ausschnitt
-------------
-
-![Backend Ausschnitt](docs/images/pkg_be.png?raw=true "TrilobitPkgBundle")
-
-
 Beispielhafte Ausgabe im Frontend
 ------------
 
 <img src="./docs/images/pkg_fe.png" alt="Backend Ausschnitt" title="TrilobitPkgBundle" width="25%">
+
+
+Keyserver
+------------
+* https://keyserver.ubuntu.com
+* https://openpgp.circl.lu
+* https://pgp.mit.edu
+* https://keys.openpgp.org
+
+
+**Restrictions on keys.openpgp.org**
+
+https://keys.openpgp.org/about/faq/
+
+Why isn't it possible to search by part of an email address, like just the domain?
+Some keyservers support search for keys by part of an email address. This allows discovery not only of keys, but also of addresses, with a query like "keys for addresses at gmail dot com". This effectively puts the addresses of all keys on those keyservers into a public listing.
+
+A search by email address on keys.openpgp.org returns a key only if it exactly matches the email address. That way, a normal user can discover the key associated with any address they already know, but they cannot discover any new email addresses. This prevents a malicious user or spammer from easily obtaining a list of all email addresses on the server.
+
 
 
 Installation
@@ -59,7 +72,10 @@ Installation
 Install the extension via composer: [trilobit-gmbh/contao-pkg-bundle](https://packagist.org/packages/trilobit-gmbh/contao-pkg-bundle).
 
 
+
 Compatibility
 -------------
 
-- Contao version ~4.9
+- Contao version ~4.13
+- Contao version ~5.3
+- Contao version ~5.7
